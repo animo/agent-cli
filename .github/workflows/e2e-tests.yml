@@ -19,4 +19,4 @@ jobs:
         with:
           command: build
       - name: E2E tests
-        run: make e2e-test
+        run: cargo test
