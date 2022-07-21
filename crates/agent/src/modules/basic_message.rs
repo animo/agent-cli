@@ -1,6 +1,11 @@
 use async_trait::async_trait;
+use serde::{Deserialize, Serialize};
 
 use crate::error::Result;
+
+/// Empty struct for a zero response
+#[derive(Serialize, Deserialize, Debug)]
+pub struct SendBasicMessageResponse;
 
 /// Options that are supplied when sending a basic message to another agent
 pub struct SendBasicMessageOptions {
@@ -15,5 +20,8 @@ pub struct SendBasicMessageOptions {
 #[async_trait]
 pub trait BasicMessageModule {
     /// Send a basic message to another agent via the connection id
-    async fn send_message(&self, options: SendBasicMessageOptions) -> Result<String>;
+    async fn send_message(
+        &self,
+        options: SendBasicMessageOptions,
+    ) -> Result<SendBasicMessageResponse>;
 }

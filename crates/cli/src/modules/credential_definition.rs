@@ -29,8 +29,8 @@ pub enum CredentialDefinitionSubcommands {
         schema_id: String,
 
         /// The tag used for registering the credential definition
-        #[clap(short, long, help = HelpStrings::CredentialDefinitionCreateTag)]
-        tag: Option<String>,
+        #[clap(short, long, help = HelpStrings::CredentialDefinitionCreateTag, default_value = "default")]
+        tag: String,
 
         /// Whether the credential definition supports revocation
         #[clap(short = 'r', long, help = HelpStrings::CredentialDefinitionCreateSupportRevocation)]
@@ -67,7 +67,7 @@ pub async fn parse_credential_definition_args(
             let options = CredentialDefinitionCreateOptions {
                 schema_id: schema_id.to_string(),
                 support_revocation: *support_revocation,
-                tag: tag.as_deref().map(|t| t.to_string()),
+                tag: tag.to_string(),
                 revocation_registry_size: *revocation_registry_size,
             };
             agent.create(options).await.map(|cred_def| {
@@ -81,11 +81,11 @@ pub async fn parse_credential_definition_args(
             Some(i) => agent.get_by_id(i.to_owned()).await.map(|cred_def| {
                 loader.stop();
                 let loggable = json!({
-                    "id": cred_def.credential_definition.id,
-                    "schema_id": cred_def.credential_definition.schema_id,
-                    "type": cred_def.credential_definition.type_field,
-                    "tag": cred_def.credential_definition.tag,
-                    "ver": cred_def.credential_definition.ver,
+                    "id": cred_def.id,
+                    "schema_id": cred_def.schema_id,
+                    "type": cred_def.type_field,
+                    "tag": cred_def.tag,
+                    "ver": cred_def.ver,
                 });
                 log_debug!("{}", pretty_stringify_obj(cred_def));
                 copy!("{}", pretty_stringify_obj(&loggable));

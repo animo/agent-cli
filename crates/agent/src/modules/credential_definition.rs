@@ -11,8 +11,7 @@ pub struct CredentialDefinitionCreateOptions {
 
     /// Optional tag used for the credential
     /// If none is supplied `default` will be used
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub tag: Option<String>,
+    pub tag: String,
 
     /// Whether the credential definition supports revocation
     pub support_revocation: bool,
@@ -27,6 +26,7 @@ pub struct CredentialDefinitionCreateOptions {
 #[derive(Debug, Deserialize, Serialize)]
 pub struct CredentialDefinitionCreateResponse {
     /// Id of the credential definition
+    #[serde(alias = "id")]
     pub credential_definition_id: String,
 }
 
@@ -40,7 +40,6 @@ pub struct CredentialDefinitionGetByIdResponse {
 
 /// A credential definition structure
 #[derive(Debug, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub struct CredentialDefinition {
     /// Version of the credential definition
     pub ver: String,
@@ -49,6 +48,7 @@ pub struct CredentialDefinition {
     pub id: String,
 
     /// Schema id on which the credential definintion is based
+    #[serde(alias = "schemaId")]
     pub schema_id: String,
 
     /// The type of the credential definition
@@ -80,7 +80,7 @@ pub trait CredentialDefinitionModule {
     ) -> Result<CredentialDefinitionCreateResponse>;
 
     /// Get the registered credential definition by id
-    async fn get_by_id(&self, id: String) -> Result<CredentialDefinitionGetByIdResponse>;
+    async fn get_by_id(&self, id: String) -> Result<CredentialDefinition>;
 
     /// Get all the registered credential definitions
     async fn get_all(&self) -> Result<CredentialDefinitionGetAllResponse>;

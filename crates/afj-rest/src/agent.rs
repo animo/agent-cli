@@ -25,6 +25,21 @@ pub enum CloudAgentAfjRestVersion {
     ZeroEightZero,
 }
 
+impl std::fmt::Display for CloudAgentAfjRestVersion {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let v = match self {
+            CloudAgentAfjRestVersion::ZeroEightZero => "0.8.0",
+        };
+        write!(f, "{}", v)
+    }
+}
+
+impl std::fmt::Display for CloudAgentAfjRest {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "AFJ {}", self.version)
+    }
+}
+
 impl CloudAgentAfjRest {
     /// Create a new instance of an AFJ REST agent
     pub fn new(

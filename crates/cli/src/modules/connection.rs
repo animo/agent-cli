@@ -117,12 +117,12 @@ pub async fn parse_connection_args(
             agent.create_invitation(options).await.map(|response| {
                 loader.stop();
                 log_info!("Created invite with connection id:");
-                log!("{}", response.connection_id);
+                log!("{}", response.id);
                 if *qr {
                     log_info!("Scan this QR code to accept the invitation:\n");
                     print_qr_code(&response.invitation_url).unwrap();
                 } else {
-                    log_info!("Another agent can use this URL to accept your invitation:\n");
+                    log_info!("Another agent can use this URL to accept your invitation:");
                     log!("{}", &response.invitation_url);
                 }
                 copy!("{}", response.invitation_url);
@@ -136,7 +136,7 @@ pub async fn parse_connection_args(
                 .map(|connection| {
                     log_debug!("{}", pretty_stringify_obj(&connection));
                     log_info!("Fetched connection id:");
-                    log!("{}", connection.connection_id);
+                    log!("{}", connection.id);
                 })
         }
         ConnectionSubcommands::List {
@@ -166,8 +166,8 @@ pub async fn parse_connection_args(
                 };
                 agent.get_all(options).await.map(|connections| {
                     loader.stop();
-                    copy!("{}", pretty_stringify_obj(&connections.results));
-                    log!("{}", pretty_stringify_obj(connections.results))
+                    copy!("{}", pretty_stringify_obj(&connections));
+                    log!("{}", pretty_stringify_obj(connections))
                 })
             }
         },

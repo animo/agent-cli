@@ -1,5 +1,5 @@
 use crate::agent::CloudAgentAfjRest;
-use agent::error::Result;
+use agent::error::{Error, Result};
 use agent::modules::schema::{Schema, SchemaCreateOptions, SchemaModule, SchemasGetAllResponse};
 use async_trait::async_trait;
 use serde_json::json;
@@ -21,7 +21,6 @@ impl SchemaModule for CloudAgentAfjRest {
     }
 
     async fn get_all(&self) -> Result<SchemasGetAllResponse> {
-        let url = self.create_url(vec!["schemas", "created"])?;
-        self.get(url, None).await
+        Err(Error::CommandNotAvailable(format!("{}", self)).into())
     }
 }

@@ -16,13 +16,16 @@ pub enum Error {
     UnknownResponseStatusCode(String),
 
     /// The server responded with a 5xx status code. Not our fault
-    InternalServerError(u16),
+    InternalServerError(u16, String),
 
     /// Supplied url is not reachable
     UnreachableUrl,
 
     /// Specific handle case for a 5xx status code which means that the cloudagent might be offline
     HttpServiceUnavailable,
+
+    /// Subcommand is not available for this agent
+    CommandNotAvailable(String),
 
     // TODO: why is this here?
     /// Predicate structure is invalid
@@ -45,11 +48,12 @@ impl Display for Error {
             Error::UnableToParseResponse => write!(f, "Unable to parse the response from the server. Is the cloudagent the correct version?"),
             Error::UrlDoesNotExist => write!(f, "Path does not exist on agent URL. This can happen when querying by id and the id is not valid or when attempting to use a feature that is not supported on the cloudagent."),
             Error::UnknownResponseStatusCode(msg) => write!(f, "Received unknown status code from the server. Agent URL is likely incorrect. If the agent URL is correct, please report this error at https://github.com/animo/agent-cli/issues/new \nAdditional info: {}", msg),
-            Error::InternalServerError(status) => write!(f, "Internal Server Error (status code: {})!", status),
+            Error::InternalServerError(status, msg) => write!(f, "Internal Server Error (status code: {})! Message: {}", status, msg),
             Error::UnreachableUrl => write!(f, "Provided url is unreachable. Is the provided agent URL valid?"),
             Error::HttpServiceUnavailable => write!(f, "Cloudagent is currently unavailable. Are you sure the agent is online?"),
             Error::UnableToParseOutValue(val) => write!(f, "Unable to parse the predicate values from: {}. The following structure is required: (name,operator,value)", val),
-            Error::InvalidOperator(op) => write!(f, "Invalid Operator ({}). \">=\", \"<=\", \"=\", \"<\" and \">\" are allowed.", op)
+            Error::InvalidOperator(op) => write!(f, "Invalid Operator ({}). \">=\", \"<=\", \"=\", \"<\" and \">\" are allowed.", op),
+            Error::CommandNotAvailable(agent) => write!(f, "Agent '{}' does not support this command", agent)
         }
     }
 }

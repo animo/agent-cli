@@ -2,16 +2,24 @@ use crate::agent::CloudAgentPython;
 use crate::fill_query;
 use agent::error::Result;
 use agent::modules::connection::{
-    Connection, ConnectionCreateInvitationOptions, ConnectionCreateInvitationResponse,
-    ConnectionGetAllOptions, ConnectionGetAllResponse, ConnectionModule,
-    ConnectionReceiveInvitationOptions,
+    Connection, ConnectionCreateInvitationOptions, ConnectionGetAllOptions, ConnectionModule,
+    ConnectionReceiveInvitationOptions, Invitation,
 };
 use async_trait::async_trait;
+use serde::{Deserialize, Serialize};
 use serde_json::json;
+
+/// Response from the server when all connections are requested
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ConnectionGetAllResponse {
+    /// List of all the connections returned by the cloudagent
+    /// these connections are already filtered on
+    pub results: Vec<Connection>,
+}
 
 #[async_trait]
 impl ConnectionModule for CloudAgentPython {
-    async fn get_all(&self, options: ConnectionGetAllOptions) -> Result<ConnectionGetAllResponse> {
+    async fn get_all(&self, options: ConnectionGetAllOptions) -> Result<Vec<Connection>> {
         let url = self.create_url(vec!["connections"])?;
 
         let query = fill_query!(
@@ -25,7 +33,9 @@ impl ConnectionModule for CloudAgentPython {
             their_role
         );
 
-        self.get(url, Some(query)).await
+        let connections: ConnectionGetAllResponse = self.get(url, Some(query)).await?;
+
+        Ok(connections.results)
     }
 
     async fn get_by_id(&self, id: String) -> Result<Connection> {
@@ -36,7 +46,7 @@ impl ConnectionModule for CloudAgentPython {
     async fn create_invitation(
         &self,
         options: ConnectionCreateInvitationOptions,
-    ) -> Result<ConnectionCreateInvitationResponse> {
+    ) -> Result<Invitation> {
         let url = self.create_url(vec!["connections", "create-invitation"])?;
         let mut query: Vec<(&str, String)> = vec![];
         let mut body = None;
@@ -61,8 +71,7 @@ impl ConnectionModule for CloudAgentPython {
                 query.push(("alias", alias.to_string()));
             }
         }
-        self.post::<ConnectionCreateInvitationResponse>(url, Some(query), body)
-            .await
+        self.post::<Invitation>(url, Some(query), body).await
     }
     async fn receive_invitation(
         &self,

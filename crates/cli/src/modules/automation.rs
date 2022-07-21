@@ -105,7 +105,7 @@ pub async fn parse_automation_args(
                     log!(
                         "{} invitation with connection id {}.",
                         "Created".green(),
-                        connection.connection_id.bold()
+                        connection.id.bold()
                     );
                     log!();
                     log!("Use this URL:\n\n{}", connection.invitation_url);
@@ -121,8 +121,7 @@ pub async fn parse_automation_args(
                 log_debug!("Looping {} times", timeout);
                 for i in 1..=*timeout {
                     let connection =
-                        ConnectionModule::get_by_id(&agent, connection.connection_id.to_owned())
-                            .await?;
+                        ConnectionModule::get_by_id(&agent, connection.id.to_owned()).await?;
                     if connection.state != "active" && connection.state != "response" {
                         log_trace!(
                             "Connection state is not active, waiting 1 second then trying again..."
@@ -130,7 +129,7 @@ pub async fn parse_automation_args(
                         std::thread::sleep(std::time::Duration::from_millis(1000));
                     } else {
                         log!("Invitation {}!", "accepted".green());
-                        credential_offer(connection.connection_id, agent).await?;
+                        credential_offer(connection.id, agent).await?;
                         break;
                     }
                     if i == *timeout {
